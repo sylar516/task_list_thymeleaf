@@ -17,6 +17,7 @@ import java.util.Properties;
 @EnableTransactionManagement
 @ComponentScan("com.javarush.springmvc")
 public class AppConfig {
+    //
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
