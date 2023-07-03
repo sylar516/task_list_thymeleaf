@@ -3,7 +3,6 @@ package com.javarush.springmvc.service;
 import com.javarush.springmvc.dao.TaskDAO;
 import com.javarush.springmvc.domain.Status;
 import com.javarush.springmvc.domain.Task;
-import com.javarush.springmvc.domain.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

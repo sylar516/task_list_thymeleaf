@@ -1,6 +1,6 @@
 package com.javarush.springmvc.domain;
 
-public class TaskInfo {
+public class TaskDTO {
     public Integer id;
     public String description;
     public Status status;

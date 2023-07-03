@@ -3,7 +3,7 @@ package com.javarush.springmvc.domain;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "task")
+@Table(name = "task", schema = "todo")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

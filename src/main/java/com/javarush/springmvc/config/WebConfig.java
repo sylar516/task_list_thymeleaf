@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
@@ -30,6 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setEnableSpringELCompiler(true); //разобратсья нужна ли эта строка?
         templateEngine.setTemplateResolver(templateResolver());
         return templateEngine;
     }
@@ -44,10 +44,10 @@ public class WebConfig implements WebMvcConfigurer {
         return templateResolver;
     }
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("task_list");
-    }
+//    @Override
+//    public void addViewControllers(ViewControllerRegistry registry) {
+//        registry.addViewController("/").setViewName("task_list");
+//    }
 
     //метод, позволяет использовать статические ресурсы, такие как файлы стилей css, картинки и тд
     @Override

@@ -1,9 +1,10 @@
 package com.javarush.springmvc.controller;
 
 import com.javarush.springmvc.domain.Task;
-import com.javarush.springmvc.domain.TaskInfo;
+import com.javarush.springmvc.domain.TaskDTO;
 import com.javarush.springmvc.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,14 +12,22 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/rest/tasks")
+@SessionAttributes(value = "taskList")
 public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @GetMapping()
-    public List<TaskInfo> getAllTasks(@RequestParam(required = false) Integer pageNumber,
-                                  @RequestParam(required = false) Integer pageSize) {
-        List<Task> allTasksOnPage = taskService.getAllTasksOnPage(pageNumber, pageSize);
+//    @GetMapping
+//    public List<TaskInfo> getAllTasks(@RequestParam(required = false) Integer pageNumber,
+//                                  @RequestParam(required = false) Integer pageSize) {
+//        List<Task> allTasksOnPage = taskService.getAllTasksOnPage(pageNumber, pageSize);
+//        return allTasksOnPage.stream().map(this::toTaskInfo).collect(Collectors.toList());
+//    }
+    @GetMapping("/")
+    public List<TaskDTO> getAllTasks(@RequestParam(required = false) Integer pageNumber,
+                                     @RequestParam(required = false) Integer pageSize, Model model) {
+        List<Task> allTasksOnPage = taskService.getAllTasksOnPage(0, 10);
+        model.addAttribute("taskList", allTasksOnPage);
         return allTasksOnPage.stream().map(this::toTaskInfo).collect(Collectors.toList());
     }
 
@@ -34,14 +43,14 @@ public class TaskController {
 
     //дописать метод по сазданию задачи в базу данных
     @PostMapping
-    public TaskInfo createTask(@RequestBody TaskInfo taskInfo) {
-        Task task = taskService.createTask(taskInfo.description, taskInfo.status);
+    public TaskDTO createTask(@RequestBody TaskDTO taskDTO) {
+        Task task = taskService.createTask(taskDTO.description, taskDTO.status);
         return toTaskInfo(task);
     }
 
     @PostMapping("/{ID}")
-    public TaskInfo saveTask(@PathVariable("ID") Integer id, @RequestBody TaskInfo taskInfo) {
-        Task task = taskService.saveOrUpdateTask(id, taskInfo.description, taskInfo.status);
+    public TaskDTO saveTask(@PathVariable("ID") Integer id, @RequestBody TaskDTO taskDTO) {
+        Task task = taskService.saveOrUpdateTask(id, taskDTO.description, taskDTO.status);
         return toTaskInfo(task);
     }
 
@@ -50,11 +59,11 @@ public class TaskController {
         taskService.deleteTask(id);
     }
 
-    private TaskInfo toTaskInfo(Task task) {
-        TaskInfo taskInfo = new TaskInfo();
-        taskInfo.id = task.getId();
-        taskInfo.description = task.getDescription();
-        taskInfo.status = task.getStatus();
-        return taskInfo;
+    private TaskDTO toTaskInfo(Task task) {
+        TaskDTO taskDTO = new TaskDTO();
+        taskDTO.id = task.getId();
+        taskDTO.description = task.getDescription();
+        taskDTO.status = task.getStatus();
+        return taskDTO;
     }
 }
