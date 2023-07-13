@@ -4,66 +4,59 @@ import com.javarush.springmvc.domain.Task;
 import com.javarush.springmvc.domain.TaskDTO;
 import com.javarush.springmvc.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/rest/tasks")
-@SessionAttributes(value = "taskList")
+import static java.util.Objects.isNull;
+
+@Controller
 public class TaskController {
+
     @Autowired
     private TaskService taskService;
 
-//    @GetMapping
-//    public List<TaskInfo> getAllTasks(@RequestParam(required = false) Integer pageNumber,
-//                                  @RequestParam(required = false) Integer pageSize) {
-//        List<Task> allTasksOnPage = taskService.getAllTasksOnPage(pageNumber, pageSize);
-//        return allTasksOnPage.stream().map(this::toTaskInfo).collect(Collectors.toList());
-//    }
     @GetMapping("/")
-    public List<TaskDTO> getAllTasks(@RequestParam(required = false) Integer pageNumber,
-                                     @RequestParam(required = false) Integer pageSize, Model model) {
-        List<Task> allTasksOnPage = taskService.getAllTasksOnPage(0, 10);
+    public String getAllTasks(@RequestParam(required = false) Integer pageNumber,
+                              @RequestParam(required = false) Integer pageSize,
+                              Model model) {
+        pageNumber = isNull(pageNumber) ? 0 : pageNumber;
+        pageSize = isNull(pageSize) ? 10 : pageSize;
+
+        List<Task> allTasksOnPage = taskService.getAllTasksOnPage(pageNumber, pageSize);
+        int countPages = (int) Math.ceil(1.0 * getCountPages()/pageSize);
+        List<Integer> pageNumbers = generateNumbers(countPages);
+
         model.addAttribute("taskList", allTasksOnPage);
-        return allTasksOnPage.stream().map(this::toTaskInfo).collect(Collectors.toList());
-    }
+        model.addAttribute("pageNumbers", pageNumbers);
 
-    @GetMapping("/count")
-    public long getTasksCount() {
-        return taskService.getTasksCount();
-    }
-
-    @GetMapping("/{ID}")
-    public Task getTask(@PathVariable("ID") Integer id) {
-        return taskService.getTask(id);
-    }
-
-    //дописать метод по сазданию задачи в базу данных
-    @PostMapping
-    public TaskDTO createTask(@RequestBody TaskDTO taskDTO) {
-        Task task = taskService.createTask(taskDTO.description, taskDTO.status);
-        return toTaskInfo(task);
+        return "task_list";
     }
 
     @PostMapping("/{ID}")
-    public TaskDTO saveTask(@PathVariable("ID") Integer id, @RequestBody TaskDTO taskDTO) {
-        Task task = taskService.saveOrUpdateTask(id, taskDTO.description, taskDTO.status);
-        return toTaskInfo(task);
+    public String saveOrUpdateTask(@PathVariable Integer ID, @RequestBody TaskDTO taskDTO, Model model) {
+        taskService.saveOrUpdateTask(ID, taskDTO.description, taskDTO.status);
+        return getAllTasks(0, 10, model);
     }
 
     @DeleteMapping("/{ID}")
-    public void deleteTask(@PathVariable("ID") Integer id) {
-        taskService.deleteTask(id);
+    public String deleteTask(@PathVariable Integer ID, Model model) {
+        taskService.deleteTask(ID);
+        return getAllTasks(0, 10, model);
     }
 
-    private TaskDTO toTaskInfo(Task task) {
-        TaskDTO taskDTO = new TaskDTO();
-        taskDTO.id = task.getId();
-        taskDTO.description = task.getDescription();
-        taskDTO.status = task.getStatus();
-        return taskDTO;
+    private long getCountPages() {
+        return taskService.getTasksCount();
+    }
+
+    private List<Integer> generateNumbers(long count) {
+        List<Integer> numbers = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            numbers.add(i);
+        }
+        return numbers;
     }
 }

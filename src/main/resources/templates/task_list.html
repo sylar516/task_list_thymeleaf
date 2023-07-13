@@ -18,6 +18,15 @@
         <td th:text="${task.id}"/>
         <td th:text="${task.description}"/>
         <td th:text="${task.status}"/>
+        <td>
+            <button type="button" th:id="'button_edit_' + ${task.id}" th:onclick="'editTask(' + ${task.id} + ')'">edit
+            </button>
+        </td>
+        <td>
+            <button type="button" th:id="'button_delete_' + ${task.id}" th:onclick="'deleteTask(' + ${task.id} + ')'">
+                delete
+            </button>
+        </td>
     </tr>
     </tbody>
 </table>
@@ -36,7 +45,7 @@
                 <option value="PAUSED">PAUSED</option>
             </select>
         </td>
-        <td><input type="button" value="save" onclick="createAccount()"></td>
+        <td><input type="button" value="save" onclick=""></td>
     </tr>
 </table>
 <div id="paging_buttons">
@@ -44,15 +53,67 @@
     <button class="link-button" type="button" th:each="pageNumber : ${pageNumbers}">
         <a th:href="@{/(pageNumber=${pageNumber})}" th:text="${pageNumber}"></a>
     </button>
-
-<!--    <form th:each="pageNumber : ${pageNumbers}" th:action="@{/(pageNumber=${pageNumber})}" method="get">-->
-<!--        <button type="submit" th:text="${pageNumber}"></button>-->
-<!--    </form>-->
-<!--    <form th:each="pageNumber : ${pageNumbers}" method="get">-->
-<!--&lt;!&ndash;        <input type="hidden" value="" th:text="${pageNumber}" name="pageNumber">&ndash;&gt;-->
-<!--        <a th:href="@{/(pageNumber=${pageNumber})}">ссылка</a>-->
-<!--    </form>-->
 </div>
 
+<script>
+    function editTask(id) {
+        let identifier_delete = "#button_delete_" + id;
+        let identifier_edit = "#button_edit_" + id;
+
+        $(identifier_delete).remove(identifier_delete);
+
+        let table_row = $(identifier_edit).parent().parent();
+        let children = table_row.children();
+
+        let table_data_description = children[1];
+        table_data_description.innerHTML = "<input id='input_description_" + id + "' value='" + table_data_description.innerHTML + "'>";
+
+        let table_data_status = children[2];
+        let current_status = table_data_status.innerHTML;
+        let status_id = "#select_status" + id;
+        table_data_status.innerHTML = getDropDownStatusList(id);
+        $(status_id).val(current_status).change();
+
+        $(identifier_edit).html('save').attr("onclick", "saveTask(" + id + ")");
+    }
+
+    function saveTask(id) {
+        let taskDescription = $("#input_description_" + id).val();
+        let taskStatus = $("#select_status" + id).val();
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json;charset=UTF-8",
+            url: "/spring_jr/" + id,
+            async: false,
+            data: JSON.stringify({"description": taskDescription, "status": taskStatus}),
+        });
+
+        window.setTimeout(() => {
+            window.document.location.reload();
+        }, 300);
+    }
+
+    function deleteTask(id) {
+        $.ajax({
+            type: "DELETE",
+            url: "/spring_jr/" + id,
+            async: false,
+            success: function () {
+                window.location.reload();
+            }
+        });
+    }
+
+    function getDropDownStatusList(id) {
+        let status_id = "select_status" + id;
+        return "<select id =" + status_id + ">" +
+            "<option value='IN_PROGRESS'>IN_PROGRESS</option>" +
+            "<option value='DONE'>DONE</option>" +
+            "<option value='PAUSED'>PAUSED</option>" +
+            "</select>"
+    }
+</script>
 </body>
 </html>
