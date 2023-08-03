@@ -1,0 +1,24 @@
+#tasks th, #tasks td {border: 2px double black; padding: 5px}
+#add_task th, #add_task td {border: 2px double black; padding: 5px}
+
+.edit_button {
+    width: 100%;
+    height: 100%;
+}
+
+.delete_button {
+    width: 100%;
+    height: 100%;
+}
+
+.active_page {
+    color: rgba(255, 99, 71, 0.99);
+}
+
+.button_page{
+    color: white;
+    border: 2px solid black;
+    margin: 5px;
+    padding: 20px;
+    font-size: large;
+}

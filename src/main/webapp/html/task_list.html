@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Список задач</title>
+    <link href="css/styles.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="scripts/my_scripts.js"></script>
+</head>
+<body>
+<table id="tasks">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th colspan="2">
+            <label for="tasks_per_page">tasks per page</label>
+            <select id="tasks_per_page" th:onchange="'showTasksList()'">
+                <option th:value="5" th:selected="${5 == limit}">5</option>
+                <option th:value="10" th:selected="${10 == limit}">10</option>
+                <option th:value="20" th:selected="${20 == limit}">20</option>
+            </select>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="task : ${tasks}">
+        <td th:text="${task.id}"/>
+        <td th:text="${task.description}"/>
+        <td th:text="${task.status}"/>
+        <td>
+            <button type="button" class="edit_button" th:id="'button_edit_' + ${task.id}" th:onclick="'editTask(' + ${task.id} + ')'">edit
+            </button>
+        </td>
+        <td>
+            <button type="button" class="delete_button" th:id="'button_delete_' + ${task.id}" th:onclick="'deleteTask(' + ${task.id} + ')'">
+                delete
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<table id="add_task">
+    <tr>
+        <th colspan="4">Add new task:</th>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td><input id="create_description_input" type="text"></td>
+        <td>
+            <select id="create_task_status">
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="DONE">DONE</option>
+                <option value="PAUSED">PAUSED</option>
+            </select>
+        </td>
+        <td>
+            <button type="button" th:onclick="'createTask(' + ${lastPage} + ',' + ${tasksCount} + ',' + ${limit} + ')'">
+                save
+            </button>
+        </td>
+    </tr>
+</table>
+<br>
+<div id="paging_buttons">
+    <label>Pages:</label>
+    <h2>
+        <button class="button_page" type="button" th:each="pageButton : ${pageButtons}">
+            <a th:href="@{/(page=${pageButton},limit=${limit})}" th:text="${pageButton}"
+               th:classappend="${pageButton == currentPage ? 'active_page' : ''}"></a>
+        </button>
+    </h2>
+</div>
+
+</body>
+</html>
